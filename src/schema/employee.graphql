@@ -29,5 +29,25 @@ type Query {
     loginAlias: String
     managerLoginAlias: String
     skills: [String!]
+    department: NonEmptyString
   ): EmployeeDataWithCount!
+}
+
+type Mutation {
+  """
+  Adds a new employee record
+  """
+  addEmployee(
+    loginAlias: NonEmptyString!
+    firstName: String
+    lastName: String
+    managerLoginAlias: String
+    skills: [NonEmptyString!]
+    department: NonEmptyString
+    joinDate: Date
+  ): String
+  """
+  Deletes an employee record
+  """
+  deleteEmployee(loginAlias: NonEmptyString!): Employee
 }

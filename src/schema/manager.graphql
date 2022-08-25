@@ -1,3 +1,17 @@
+type ManagerEmpData {
+  LoginAlias: String
+  FirstName: String
+  LastName: String
+  ManagerLoginAlias: String
+  Skills: [String]
+}
+
+type managerEmpDataWithCount {
+  count: Int
+  data: [ManagerEmpData]
+  lastEvaluatedKey: String
+}
+
 type Query {
-  getEmployeesOfManager(managerLoginAlias: String!): EmployeeDataWithCount
+  getEmployeesOfManager(managerLoginAlias: NonEmptyString!): managerEmpDataWithCount
 }

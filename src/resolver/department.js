@@ -1,6 +1,6 @@
 /// Import required AWS SDK clients and commands for Node.js
-import { QueryCommand } from '@aws-sdk/client-dynamodb';
-import { toDeptArray } from '../utils/deptDataFormatter';
+import { QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { numberToDate } from '../utils/common';
 import CONSTANTS from '../constants/constants';
 
 // query on GSI
@@ -12,9 +12,7 @@ const getDeptEmployees = async (_parent, args, context) => {
         IndexName: 'DepartmentEmployees',
         KeyConditionExpression: 'Department = :department',
         ExpressionAttributeValues: {
-          ':department': {
-            S: args.department
-          }
+          ':department': args.department
         },
         ExclusiveStartKey: args.lastEvaluatedKey && JSON.parse(args.lastEvaluatedKey),
         ScanIndexForward: args.sortDateAscending
@@ -22,7 +20,7 @@ const getDeptEmployees = async (_parent, args, context) => {
     );
     return {
       count: data.Count,
-      data: toDeptArray(data.Items),
+      data: data.Items.map(numberToDate),
       lastEvaluatedKey: data.LastEvaluatedKey && JSON.stringify(data.LastEvaluatedKey)
     };
   } catch (error) {
@@ -35,15 +33,9 @@ const getDeptEmployees = async (_parent, args, context) => {
 const getDeptEmployeesJoinedBetween = async (_parent, args, context) => {
   try {
     const expressionAttributeValues = {
-      ':department': {
-        S: args.department
-      },
-      ':startDate': {
-        N: new Date(args.startDate).getTime()
-      },
-      ':endDate': {
-        N: new Date(args.endDate).getTime()
-      }
+      ':department': args.department,
+      ':startDate': new Date(args.startDate).getTime(),
+      ':endDate': new Date(args.endDate).getTime()
     };
     if (args.loginBeginsWith) {
       expressionAttributeValues[':loginBeginsWith'] = {
@@ -64,7 +56,7 @@ const getDeptEmployeesJoinedBetween = async (_parent, args, context) => {
     );
     return {
       count: data.Count,
-      data: toDeptArray(data.Items),
+      data: data.Items.map(numberToDate),
       lastEvaluatedKey: data.LastEvaluatedKey && JSON.stringify(data.LastEvaluatedKey)
     };
   } catch (error) {

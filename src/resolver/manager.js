@@ -1,5 +1,5 @@
 /// Import required AWS SDK clients and commands for Node.js
-import { QueryCommand } from '@aws-sdk/client-dynamodb';
+import { QueryCommand } from '@aws-sdk/lib-dynamodb';
 import CONSTANTS from '../constants/constants';
 
 const getEmployeesOfManager = async (_parent, args, context) => {
@@ -11,15 +11,14 @@ const getEmployeesOfManager = async (_parent, args, context) => {
         KeyConditionExpression: 'ManagerLoginAlias = :managerLoginAlias',
         ProjectionExpression: 'LoginAlias,FirstName,LastName,ManagerLoginAlias,Skills',
         ExpressionAttributeValues: {
-          ':managerLoginAlias': {
-            S: args.managerLoginAlias
-          }
+          ':managerLoginAlias': args.managerLoginAlias
         }
       })
     );
+    console.log(data.Items);
     return {
       count: data.Count,
-      data: data.Items.map((v) => context.pretty(v)),
+      data: data.Items,
       lastEvaluatedKey: data.LastEvaluatedKey && JSON.stringify(data.LastEvaluatedKey)
     };
   } catch (error) {

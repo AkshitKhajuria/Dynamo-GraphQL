@@ -1,25 +1,23 @@
 /// Import required AWS SDK clients and commands for Node.js
-import { GetItemCommand, ScanCommand } from '@aws-sdk/client-dynamodb';
+import { GetCommand, ScanCommand, PutCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
+import { numberToDate } from '../utils/common';
 import CONSTANTS from '../constants/constants';
 
 const getEmployeeByLoginAlias = async (_parent, args, context) => {
   try {
     console.log();
     const data = await context.client.send(
-      new GetItemCommand({
+      new GetCommand({
         TableName: CONSTANTS.tableNames.Employee,
         Key: {
-          LoginAlias: {
-            S: args.id
-          }
+          LoginAlias: args.id
         }
       })
     );
-    const result = context.pretty(data.Item || '');
-    if (result.JoinDate) {
-      result.JoinDate = new Date(result.JoinDate);
+    if (data.Item && data.Item.JoinDate) {
+      data.Item.JoinDate = new Date(data.Item.JoinDate);
     }
-    return result;
+    return data.Item;
   } catch (error) {
     console.log(error);
     return error;
@@ -32,24 +30,28 @@ const getAllEmployees = async (_parent, args, context) => {
     const expressionAttributeValues = {};
     if (args.firstName) {
       filterExpressionList.push('FirstName = :firstName');
-      expressionAttributeValues[':firstName'] = { S: args.firstName };
+      expressionAttributeValues[':firstName'] = args.firstName;
     }
     if (args.lastName) {
       filterExpressionList.push('LastName = :lastName');
-      expressionAttributeValues[':lastName'] = { S: args.lastName };
+      expressionAttributeValues[':lastName'] = args.lastName;
     }
     if (args.loginAlias) {
       filterExpressionList.push('LoginAlias = :loginAlias');
-      expressionAttributeValues[':loginAlias'] = { S: args.loginAlias };
+      expressionAttributeValues[':loginAlias'] = args.loginAlias;
     }
     if (args.managerLoginAlias) {
       filterExpressionList.push('ManagerLoginAlias = :managerLoginAlias');
-      expressionAttributeValues[':managerLoginAlias'] = { S: args.managerLoginAlias };
+      expressionAttributeValues[':managerLoginAlias'] = args.managerLoginAlias;
+    }
+    if (args.department) {
+      filterExpressionList.push('Department = :department');
+      expressionAttributeValues[':department'] = args.department;
     }
     if (args.skills && args.skills.length) {
       args.skills.forEach((value, index) => {
         filterExpressionList.push(`contains(Skills, :skill${index})`);
-        expressionAttributeValues[`:skill${index}`] = { S: value };
+        expressionAttributeValues[`:skill${index}`] = value;
       });
     }
 
@@ -57,7 +59,7 @@ const getAllEmployees = async (_parent, args, context) => {
       new ScanCommand({
         TableName: CONSTANTS.tableNames.Employee,
         ExclusiveStartKey: args.lastEvaluatedKey && JSON.parse(args.lastEvaluatedKey),
-        Limit: args.limit || 10,
+        Limit: args.limit,
         FilterExpression: filterExpressionList.length
           ? filterExpressionList.join(' and ')
           : undefined,
@@ -67,15 +69,56 @@ const getAllEmployees = async (_parent, args, context) => {
       })
     );
     return {
-      count: data.Count,
-      // need to marshall individual records as marshall map does not work. Ref: https://github.com/aws/aws-sdk-js-v3/issues/3849
-      data: data.Items.map((v) => {
-        const item = context.pretty(v);
-        item.JoinDate = item.JoinDate && new Date(item.JoinDate);
-        return item;
-      }),
+      count: data.ScannedCount,
+      data: data.Items.map(numberToDate),
       lastEvaluatedKey: data.LastEvaluatedKey && JSON.stringify(data.LastEvaluatedKey)
     };
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
+const addEmployee = async (_parent, args, context) => {
+  try {
+    await context.client.send(
+      new PutCommand({
+        TableName: CONSTANTS.tableNames.Employee,
+        Item: {
+          LoginAlias: args.loginAlias,
+          LastName: args.lastName,
+          ManagerLoginAlias: args.managerLoginAlias,
+          Skills: args.skills,
+          FirstName: args.firstName,
+          JoinDate: args.joinDate && new Date(args.joinDate).getTime(),
+          Department: args.department
+        },
+        ConditionExpression: 'attribute_not_exists(LoginAlias)',
+        ReturnValues: 'ALL_OLD' // useless if inserting new item (ಠ_ಠ)
+      })
+    );
+    // PutItem does not return anything if insertin a new record
+    // so we'll cheat here and return the provided arguement ¯\_(⌣̯̀ ⌣́)_/¯
+    return args.loginAlias;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
+const deleteEmployee = async (_parent, args, context) => {
+  try {
+    const data = await context.client.send(
+      new DeleteCommand({
+        TableName: CONSTANTS.tableNames.Employee,
+        Key: {
+          LoginAlias: args.loginAlias
+        },
+        ConditionExpression: 'attribute_exists(LoginAlias)',
+        ReturnValues: 'ALL_OLD'
+      })
+    );
+    return numberToDate(data.Attributes);
   } catch (error) {
     console.log(error);
     return error;
@@ -86,5 +129,9 @@ export default {
   Query: {
     getEmployeeByLoginAlias,
     getAllEmployees
+  },
+  Mutation: {
+    addEmployee,
+    deleteEmployee
   }
 };

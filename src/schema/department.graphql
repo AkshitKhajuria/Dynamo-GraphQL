@@ -16,9 +16,9 @@ type Query {
   Defaults to ascending sort
   """
   getDeptEmployees(
-    department: String!
+    department: NonEmptyString!
     sortDateAscending: Boolean = true
-    lastEvaluatedKey: String
+    lastEvaluatedKey: NonEmptyString
   ): DeptDataWithCount
   """
   Fetches all employees for a Department that joined between a date range.
@@ -26,11 +26,11 @@ type Query {
   Data can be sorted by employee joining date. Defaults to ascending sort.
   """
   getDeptEmployeesJoinedBetween(
-    department: String!
+    department: NonEmptyString!
     startDate: Date!
     endDate: Date!
-    loginBeginsWith: String
+    loginBeginsWith: NonEmptyString
     sortDateAscending: Boolean = true
-    lastEvaluatedKey: String
+    lastEvaluatedKey: NonEmptyString
   ): DeptDataWithCount!
 }
