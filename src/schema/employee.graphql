@@ -1,0 +1,33 @@
+type Employee {
+  LoginAlias: String
+  FirstName: String
+  LastName: String
+  ManagerLoginAlias: String
+  Skills: [String]
+  Department: String
+  JoinDate: Date
+}
+
+type EmployeeDataWithCount {
+  count: Int
+  data: [Employee]
+  """
+  The lastEvaluatedKey is only returned when there are more items left to process
+  but were clipped for pagination. Passing this back as a parameter will cause
+  the pagination to continue.
+  """
+  lastEvaluatedKey: String
+}
+
+type Query {
+  getEmployeeByLoginAlias(id: String!): Employee
+  getAllEmployees(
+    limit: Int = 10
+    lastEvaluatedKey: String
+    firstName: String
+    lastName: String
+    loginAlias: String
+    managerLoginAlias: String
+    skills: [String!]
+  ): EmployeeDataWithCount!
+}

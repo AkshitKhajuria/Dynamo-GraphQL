@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+  dynamo_local:
+    container_name: ddb_local
+    image: 'amazon/dynamodb-local:latest'
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      AWS_ACCESS_KEY_ID: dummyaccesskeyid
+      AWS_SECRET_ACCESS_KEY: dummysecretaccesskey
+    volumes:
+      - dynamodb_local:/home/dynamodblocal/db
+    working_dir: /home/dynamodblocal
+    ports:
+      - 8000:8000
+
+volumes:
+  dynamodb_local:
