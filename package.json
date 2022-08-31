@@ -28,7 +28,7 @@
     "docker"
   ],
   "author": "Akshit",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.154.0",
     "@aws-sdk/lib-dynamodb": "^3.154.0",
