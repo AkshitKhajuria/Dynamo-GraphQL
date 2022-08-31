@@ -5,7 +5,6 @@ import CONSTANTS from '../constants/constants';
 
 const getEmployeeByLoginAlias = async (_parent, args, context) => {
   try {
-    console.log();
     const data = await context.client.send(
       new GetCommand({
         TableName: CONSTANTS.tableNames.Employee,

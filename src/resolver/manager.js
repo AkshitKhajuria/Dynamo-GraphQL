@@ -15,7 +15,6 @@ const getEmployeesOfManager = async (_parent, args, context) => {
         }
       })
     );
-    console.log(data.Items);
     return {
       count: data.Count,
       data: data.Items,

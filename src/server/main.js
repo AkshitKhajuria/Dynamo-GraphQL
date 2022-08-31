@@ -12,7 +12,7 @@ import { loadSchemaSync } from '@graphql-tools/load';
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 import { loadFilesSync } from '@graphql-tools/load-files';
 import { mergeResolvers } from '@graphql-tools/merge';
-import { client, pretty } from '../libs/ddbClient';
+import { client } from '../libs/ddbClient';
 const schema = loadSchemaSync('src/schema/**/*.graphql', {
   loaders: [new GraphQLFileLoader()]
 });
@@ -26,8 +26,7 @@ const server = new ApolloServer({
   typeDefs: schema,
   resolvers,
   context: {
-    client,
-    pretty
+    client
   },
   csrfPrevention: true,
   cache: 'bounded',
