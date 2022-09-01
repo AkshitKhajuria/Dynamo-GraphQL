@@ -353,7 +353,7 @@ async function populateEmployee() {
         PutRequest: {
           Item: {
             LoginAlias: {
-              S: randomEmployees[index].toLowerCase()
+              S: randomManagers[index].toLowerCase()
             },
             LastName: {
               S: faker.name.lastName()
@@ -380,8 +380,7 @@ async function populateEmployee() {
 
     const batchSize = 25;
     let batchStart = 0;
-    let batchOffset = 25;
-    let batchData = sampleData.slice(0, batchOffset);
+    let batchData = sampleData.slice(batchStart, batchStart + batchSize);
 
     console.log(`Employee: Populating ${sampleData.length} records`);
     while (batchData.length > 0) {
@@ -392,9 +391,8 @@ async function populateEmployee() {
           }
         })
       );
-      batchStart = batchOffset;
-      batchOffset += batchSize;
-      batchData = sampleData.slice(batchStart, batchOffset);
+      batchStart += batchSize;
+      batchData = sampleData.slice(batchStart, batchStart + batchSize);
     }
     return;
   } catch (error) {
@@ -424,8 +422,7 @@ async function populateCompany() {
 
     const batchSize = 25;
     let batchStart = 0;
-    let batchOffset = 25;
-    let batchData = sampleData.slice(0, batchOffset);
+    let batchData = sampleData.slice(batchStart, batchStart + batchSize);
 
     console.log(`Company: Populating ${sampleData.length} records`);
     while (batchData.length > 0) {
@@ -436,9 +433,8 @@ async function populateCompany() {
           }
         })
       );
-      batchStart = batchOffset;
-      batchOffset += batchSize;
-      batchData = sampleData.slice(batchStart, batchOffset);
+      batchStart += batchSize;
+      batchData = sampleData.slice(batchStart, batchStart + batchSize);
     }
     COMPANYIDS = companyIds;
     return;
@@ -512,8 +508,7 @@ async function populatePets() {
 
     const batchSize = 25;
     let batchStart = 0;
-    let batchOffset = 25;
-    let batchData = sampleData.slice(0, batchOffset);
+    let batchData = sampleData.slice(batchStart, batchStart + batchSize);
 
     console.log(`Pets: Populating ${sampleData.length} records`);
     while (batchData.length > 0) {
@@ -524,9 +519,8 @@ async function populatePets() {
           }
         })
       );
-      batchStart = batchOffset;
-      batchOffset += batchSize;
-      batchData = sampleData.slice(batchStart, batchOffset);
+      batchStart += batchSize;
+      batchData = sampleData.slice(batchStart, batchStart + batchSize);
     }
     return;
   } catch (error) {
