@@ -13,8 +13,8 @@ type EmployeeDataWithCount {
   This is the total number of records scanned before returning the filtered records.
   It is NOT the number of records returned as data.
   """
-  count: Int
-  data: [Employee]
+  count: Int!
+  data: [Employee]!
   """
   The lastEvaluatedKey is only returned when there are more items left to process
   but were clipped for pagination. Passing this back as a parameter will cause

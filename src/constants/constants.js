@@ -1,5 +1,7 @@
 module.exports = {
   tableNames: {
-    Employee: 'Employee'
+    Employee: 'Employee',
+    Pets: 'Pets',
+    Company: 'Company'
   }
 };

@@ -168,10 +168,6 @@ async function createCompany() {
           {
             AttributeName: 'id',
             KeyType: 'HASH'
-          },
-          {
-            AttributeName: 'company_title',
-            KeyType: 'RANGE'
           }
         ],
         BillingMode: 'PROVISIONED',
@@ -179,10 +175,6 @@ async function createCompany() {
           {
             AttributeName: 'id',
             AttributeType: 'N'
-          },
-          {
-            AttributeName: 'company_title',
-            AttributeType: 'S'
           }
         ],
         ProvisionedThroughput: {

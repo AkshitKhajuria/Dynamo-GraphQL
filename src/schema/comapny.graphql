@@ -1,0 +1,24 @@
+type Company {
+  id: BigInt!
+  company_title: String
+}
+
+type CompanyDataWithCount {
+  """
+  This is the total number of records scanned before returning the filtered records.
+  It is NOT the number of records returned as data.
+  """
+  count: Int!
+  data: [Company]!
+  """
+  The lastEvaluatedKey is only returned when there are more items left to process
+  but were clipped for pagination. Passing this back as a parameter will cause
+  the pagination to continue.
+  """
+  lastEvaluatedKey: String
+}
+
+type Query {
+  getCompanyById(id: BigInt!): Company
+  getAllCompanies(id: BigInt, companyTitle: String): CompanyDataWithCount!
+}

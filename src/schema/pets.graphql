@@ -1,0 +1,93 @@
+type Pet {
+  id: String!
+  accesses_permission: String
+  bbm_insured_entity_uuid: String
+  company_id: BigInt
+  createdAt: String
+  customer_id: String
+  family_name: String
+  pet_name: String
+  pet_type: String
+  policy_number: BigInt
+  policy_status: String
+  updatedAt: String
+}
+
+type PetWithCompany {
+  id: String!
+  accesses_permission: String
+  bbm_insured_entity_uuid: String
+  company_id: BigInt
+  company: Company
+  createdAt: String
+  customer_id: String
+  family_name: String
+  pet_name: String
+  pet_type: String
+  policy_number: BigInt
+  policy_status: String
+  updatedAt: String
+}
+
+type PetsDataWithCount {
+  """
+  This is the total number of records scanned before returning the filtered records.
+  It is NOT the number of records returned as data.
+  """
+  count: Int!
+  data: [PetWithCompany]!
+  """
+  The lastEvaluatedKey is only returned when there are more items left to process
+  but were clipped for pagination. Passing this back as a parameter will cause
+  the pagination to continue.
+  """
+  lastEvaluatedKey: String
+}
+
+type PetCompanyDataWithCount {
+  count: Int!
+  data: [PetWithCompany]!
+  lastEvaluatedKey: String
+}
+
+type Query {
+  getPetById(id: NonEmptyString!): Pet
+
+  getPetsAndCompanyByPetType(
+    petType: NonEmptyString!
+    petName: NonEmptyString
+    policyStatus: [NonEmptyString!]
+  ): PetCompanyDataWithCount!
+
+  getAllPets(
+    limit: Int = 50
+    id: String
+    petType: String
+    petName: String
+    """
+    Exact Match
+    """
+    companyId: String
+    """
+    Exact Match
+    """
+    policyNumber: String
+    """
+    Exact Match for individual values
+    """
+    policyStatus: String
+    """
+    Exact Match
+    """
+    customerId: String
+    familyName: String
+    enforceANDCondition: Boolean = false
+  ): PetsDataWithCount!
+
+  getPetsByPolicyStatus(
+    policyStatus: NonEmptyString!
+    petType: String
+    petName: String
+    sortByPolicyNumAcsending: Boolean = true
+  ): PetsDataWithCount!
+}

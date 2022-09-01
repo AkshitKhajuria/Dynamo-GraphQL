@@ -1,5 +1,6 @@
-import { DateResolver, NonEmptyStringResolver } from 'graphql-scalars';
+import { DateResolver, NonEmptyStringResolver, BigIntResolver } from 'graphql-scalars';
 export default {
   Date: DateResolver,
-  NonEmptyString: NonEmptyStringResolver
+  NonEmptyString: NonEmptyStringResolver,
+  BigInt: BigIntResolver
 };
