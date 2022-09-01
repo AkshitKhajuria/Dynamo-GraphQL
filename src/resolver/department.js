@@ -14,7 +14,9 @@ const getDeptEmployees = async (_parent, args, context) => {
         ExpressionAttributeValues: {
           ':department': args.department
         },
-        ExclusiveStartKey: args.lastEvaluatedKey && JSON.parse(args.lastEvaluatedKey),
+        Limit: args.limit || undefined,
+        ExclusiveStartKey:
+          (args.lastEvaluatedKey && JSON.parse(args.lastEvaluatedKey)) || undefined,
         ScanIndexForward: args.sortDateAscending
       })
     );
@@ -50,7 +52,9 @@ const getDeptEmployeesJoinedBetween = async (_parent, args, context) => {
           'Department = :department and JoinDate between :startDate AND :endDate',
         FilterExpression: args.loginBeginsWith && 'begins_with (LoginAlias, :loginBeginsWith)',
         ExpressionAttributeValues: expressionAttributeValues,
-        ExclusiveStartKey: args.lastEvaluatedKey && JSON.parse(args.lastEvaluatedKey),
+        Limit: args.limit || undefined,
+        ExclusiveStartKey:
+          (args.lastEvaluatedKey && JSON.parse(args.lastEvaluatedKey)) || undefined,
         ScanIndexForward: args.sortDateAscending
       })
     );

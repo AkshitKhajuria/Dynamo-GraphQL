@@ -106,7 +106,7 @@ async function createEmployee() {
             }
           },
           {
-            IndexName: 'Name',
+            IndexName: 'NameIndexSearch',
             KeySchema: [
               {
                 AttributeName: 'FirstName',
@@ -138,8 +138,7 @@ async function createEmployee() {
               }
             ],
             Projection: {
-              ProjectionType: 'INCLUDE',
-              NonKeyAttributes: ['LoginAlias']
+              ProjectionType: 'ALL'
             },
             ProvisionedThroughput: {
               ReadCapacityUnits: 1,

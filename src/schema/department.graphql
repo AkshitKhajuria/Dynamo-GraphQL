@@ -1,36 +1,26 @@
-type DeptData {
-  LoginAlias: String
-  Department: String
-  JoinDate: Date
-}
-
-type DeptDataWithCount {
-  count: Int!
-  data: [DeptData]
-  lastEvaluatedKey: String
-}
-
 type Query {
   """
   Fetches all employees for a Department. Data can be sorted by employee joining date.
   Defaults to ascending sort
   """
   getDeptEmployees(
+    limit: Int
     department: NonEmptyString!
     sortDateAscending: Boolean = true
     lastEvaluatedKey: NonEmptyString
-  ): DeptDataWithCount
+  ): EmployeeDataWithCount!
   """
   Fetches all employees for a Department that joined between a date range.
   Can filter the results based on what letters the LoginAlias begins with.
   Data can be sorted by employee joining date. Defaults to ascending sort.
   """
   getDeptEmployeesJoinedBetween(
+    limit: Int
     department: NonEmptyString!
     startDate: Date!
     endDate: Date!
     loginBeginsWith: NonEmptyString
     sortDateAscending: Boolean = true
     lastEvaluatedKey: NonEmptyString
-  ): DeptDataWithCount!
+  ): EmployeeDataWithCount!
 }

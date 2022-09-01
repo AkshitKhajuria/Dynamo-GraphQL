@@ -1,5 +1,11 @@
 /// Import required AWS SDK clients and commands for Node.js
-import { GetCommand, ScanCommand, PutCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
+import {
+  GetCommand,
+  ScanCommand,
+  PutCommand,
+  DeleteCommand,
+  QueryCommand
+} from '@aws-sdk/lib-dynamodb';
 import { numberToDate } from '../utils/common';
 import CONSTANTS from '../constants/constants';
 
@@ -36,15 +42,15 @@ const getAllEmployees = async (_parent, args, context) => {
       expressionAttributeValues[':lastName'] = args.lastName;
     }
     if (args.loginAlias) {
-      filterExpressionList.push('LoginAlias = :loginAlias');
+      filterExpressionList.push('contains(LoginAlias, :loginAlias)');
       expressionAttributeValues[':loginAlias'] = args.loginAlias;
     }
     if (args.managerLoginAlias) {
-      filterExpressionList.push('ManagerLoginAlias = :managerLoginAlias');
+      filterExpressionList.push('contains(ManagerLoginAlias, :managerLoginAlias)');
       expressionAttributeValues[':managerLoginAlias'] = args.managerLoginAlias;
     }
     if (args.department) {
-      filterExpressionList.push('Department = :department');
+      filterExpressionList.push('contains(Department, :department)');
       expressionAttributeValues[':department'] = args.department;
     }
     if (args.skills && args.skills.length) {
@@ -57,10 +63,11 @@ const getAllEmployees = async (_parent, args, context) => {
     const data = await context.client.send(
       new ScanCommand({
         TableName: CONSTANTS.tableNames.Employee,
-        ExclusiveStartKey: args.lastEvaluatedKey && JSON.parse(args.lastEvaluatedKey),
-        Limit: args.limit,
+        ExclusiveStartKey:
+          (args.lastEvaluatedKey && JSON.parse(args.lastEvaluatedKey)) || undefined,
+        Limit: args.limit || undefined,
         FilterExpression: filterExpressionList.length
-          ? filterExpressionList.join(' and ')
+          ? filterExpressionList.join(' or ')
           : undefined,
         ExpressionAttributeValues: Object.keys(expressionAttributeValues).length
           ? expressionAttributeValues
@@ -69,6 +76,33 @@ const getAllEmployees = async (_parent, args, context) => {
     );
     return {
       count: data.ScannedCount,
+      data: data.Items.map(numberToDate),
+      lastEvaluatedKey: data.LastEvaluatedKey && JSON.stringify(data.LastEvaluatedKey)
+    };
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
+const getEmployeeByName = async (_parent, args, context) => {
+  try {
+    const data = await context.client.send(
+      new QueryCommand({
+        TableName: CONSTANTS.tableNames.Employee,
+        IndexName: 'NameIndexSearch',
+        KeyConditionExpression: `FirstName = :firstName`,
+        ExpressionAttributeValues: {
+          ':firstName': args.firstName
+        },
+        Limit: args.limit || undefined,
+        ExclusiveStartKey:
+          (args.lastEvaluatedKey && JSON.parse(args.lastEvaluatedKey)) || undefined,
+        ScanIndexForward: args.sortLastNameAscending
+      })
+    );
+    return {
+      count: data.Count,
       data: data.Items.map(numberToDate),
       lastEvaluatedKey: data.LastEvaluatedKey && JSON.stringify(data.LastEvaluatedKey)
     };
@@ -127,6 +161,7 @@ const deleteEmployee = async (_parent, args, context) => {
 export default {
   Query: {
     getEmployeeByLoginAlias,
+    getEmployeeByName,
     getAllEmployees
   },
   Mutation: {

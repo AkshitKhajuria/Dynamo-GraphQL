@@ -25,23 +25,27 @@ type EmployeeDataWithCount {
 
 type Query {
   getEmployeeByLoginAlias(id: String!): Employee
+
+  getEmployeeByName(
+    firstName: NonEmptyString!
+    limit: Int
+    lastEvaluatedKey: String
+  ): EmployeeDataWithCount!
+
   """
   Scan full database and filter the results based on optional conditions.
   Conditional values must be an exact match unless specified otherwise.
   """
   getAllEmployees(
-    limit: Int = 10
+    limit: Int
     lastEvaluatedKey: String
-    """
-    Provided value is checked based on sub-string matching. Case sensitive
-    """
     firstName: String
-    """
-    Provided value is checked based on sub-string matching. Case sensitive
-    """
     lastName: String
     loginAlias: String
     managerLoginAlias: String
+    """
+    Provided value is checked based on exact match. Case sensitive
+    """
     skills: [String!]
     department: NonEmptyString
   ): EmployeeDataWithCount!
