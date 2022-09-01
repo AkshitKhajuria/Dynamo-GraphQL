@@ -28,11 +28,11 @@ const getAllEmployees = async (_parent, args, context) => {
     const filterExpressionList = [];
     const expressionAttributeValues = {};
     if (args.firstName) {
-      filterExpressionList.push('FirstName = :firstName');
+      filterExpressionList.push('contains(FirstName, :firstName)');
       expressionAttributeValues[':firstName'] = args.firstName;
     }
     if (args.lastName) {
-      filterExpressionList.push('LastName = :lastName');
+      filterExpressionList.push('contains(LastName, :lastName)');
       expressionAttributeValues[':lastName'] = args.lastName;
     }
     if (args.loginAlias) {

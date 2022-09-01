@@ -9,6 +9,10 @@ type Employee {
 }
 
 type EmployeeDataWithCount {
+  """
+  This is the total number of records scanned before returning the filtered records.
+  It is NOT the number of records returned as data.
+  """
   count: Int
   data: [Employee]
   """
@@ -21,10 +25,20 @@ type EmployeeDataWithCount {
 
 type Query {
   getEmployeeByLoginAlias(id: String!): Employee
+  """
+  Scan full database and filter the results based on optional conditions.
+  Conditional values must be an exact match unless specified otherwise.
+  """
   getAllEmployees(
     limit: Int = 10
     lastEvaluatedKey: String
+    """
+    Provided value is checked based on sub-string matching. Case sensitive
+    """
     firstName: String
+    """
+    Provided value is checked based on sub-string matching. Case sensitive
+    """
     lastName: String
     loginAlias: String
     managerLoginAlias: String
